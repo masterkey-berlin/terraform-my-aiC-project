@@ -44,7 +44,7 @@ variable "env_vars" {
 variable "networks_advanced" {
   description = "Advanced network configuration. List of network objects to connect to."
   type = list(object({
-    name    = string # Name des Docker-Netzwerks
+    name = string # Name des Docker-Netzwerks
     # alias   = optional(string) # Alias für den Container in diesem Netzwerk
     # ip_address = optional(string) # Feste IP-Adresse in diesem Netzwerk (mit Vorsicht verwenden)
   }))
