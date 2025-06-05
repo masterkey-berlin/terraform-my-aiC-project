@@ -1,0 +1,3 @@
+# Terraform Ganztagesaufgabe – Kurze Zusammenfassung
+
+Diese Aufgabe zielt darauf ab, einen eigenen, nicht-trivialen Infrastruktur-Prototyp mit Terraform zu erstellen. Dabei sollen alle gelernten Konzepte (Provider, Ressourcen, Variablen, Outputs, Locals, Module) angewendet werden, um eine sinnvolle Infrastruktur zu modellieren. Ziel ist es, den kompletten Terraform-Workflow (init, plan, apply, destroy) durchzuführen, die Konfiguration zu dokumentieren und die Lösung zu reflektieren. Die Aufgabe fördert eigenständiges Arbeiten, Verständnis für IaC und die praktische Anwendung der Terraform-Bausteine.
