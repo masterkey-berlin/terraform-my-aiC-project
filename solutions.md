@@ -166,3 +166,48 @@ Nachteil, die Infrastruktur ist manuell nicht 1:1 reproduzierbar und es daurt vi
 ![alt text](<Screenshot 2025-06-05 124058.png>)
 ![alt text](<Screenshot 2025-06-05 134021.png>)
 ![alt text](<Screenshot 2025-06-05 135259.png>)
+
+
+
+## Remote State Backend Konfiguration
+
+### Warum Remote State?
+Ein Remote State Backend wird verwendet für:
+*   **Teamarbeit:** Ermöglicht mehreren Teammitgliedern, auf denselben Infrastrukturzustand zuzugreifen und daran zusammenzuarbeiten.
+*   **Schutz vor lokalem Verlust:** Verhindert den Verlust des States bei Problemen mit lokalen Entwicklerrechnern.
+*   **Konsistenz & Zuverlässigkeit:** Bietet einen zentralen, verlässlichen Speicherort für den State.
+*   **(Fortgeschritten):** Ermöglicht State Locking (nicht Teil dieser Aufgabe), um Konflikte bei gleichzeitigen Änderungen zu verhindern.
+
+### Gewählter Provider & Backend
+Für dieses Projekt wurde **Azure Blob Storage** als Remote State Backend verwendet.
+
+### Backend-Konfiguration
+Der folgende `backend`-Block wurde der Terraform-Konfiguration (z.B. in `versions.tf` oder `backend.tf`) hinzugefügt:
+
+```terraform
+terraform {
+  # ... (required_providers etc.) ...
+
+  backend "azurerm" {
+    resource_group_name  = "rg-24-08-on-..." # Ersetzt durch meinen Ressourcengruppen-Namen
+    storage_account_name = "terraformstate66"      # Ersetzt durch meinen Storage Account Namen
+    container_name       = "tfstate"               # Ersetzt durch meinen Container Namen
+    key                  = "meine-docker-app/terraform.tfstate" # Pfad & Dateiname im Container
+  }
+}
+
+## terraform init Prozess (Migration des States)
+
+Nachdem der backend "azurerm" Block zur Konfiguration hinzugefügt wurde, wurde terraform init ausgeführt. Terraform erkannte die neue Backend-Konfiguration. Da zuvor ein lokaler State (terraform.tfstate) existierte (oder hätte existieren können), fragte Terraform interaktiv, ob dieser bestehende State zum neuen Azure Blob Storage Backend migriert werden soll. Durch Bestätigung mit yes wurde der lokale State in den konfigurierten Azure Blob Storage Container hochgeladen und dort unter dem angegebenen key gespeichert.
+
+## Überprüfung des Remote States
+Die erfolgreiche Speicherung des States in der Cloud wurde wie folgt verifiziert:
+Nach erfolgreichem terraform init (und ggf. einem ersten terraform apply mit dem Remote Backend).
+Navigation zum Azure Portal.
+
+## Öffnen des Speicherkontos terraformstate66.
+Navigation zum Blob-Container tfstate.
+
+Dort wurde das Blob-Objekt meine-docker-app/terraform.tfstate gefunden, dessen Änderungsdatum dem Zeitpunkt der letzten Terraform-Operation entsprach.
+Rolle der lokalen terraform.tfstate nach der Migration
+Nach der erfolgreichen Migration zum Azure Remote Backend ist die lokale terraform.tfstate-Datei im Projektverzeichnis entweder nicht mehr vorhanden oder sie ist sehr klein und enthält lediglich einen Verweis bzw. einen Zeiger auf das konfigurierte Remote Backend. Der eigentliche Zustand der Infrastruktur wird nicht mehr lokal, sondern zentral in Azure Blob Storage verwaltet.
